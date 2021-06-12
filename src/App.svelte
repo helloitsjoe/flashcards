@@ -2,10 +2,21 @@
   const data = [
     ['Start', 'Start'],
     ['a', 'あ'],
-    ['i', 'い'],
     ['e', 'え'],
+    ['i', 'い'],
     ['o', 'お'],
     ['u', 'う'],
+    ['ka', 'か'],
+    ['ke', 'け'],
+    ['ki', 'き'],
+    ['ko', 'こ'],
+    ['ku', 'く'],
+    ['ga', 'が'],
+    ['ge', 'げ'],
+    ['gi', 'ぎ'],
+    ['go', 'ご'],
+    ['gu', 'ぐ'],
+    ['n', 'ん'],
   ];
 
   // let remaining = [...data];
@@ -20,12 +31,10 @@
 
   const getNext = () => {
     currentIdx = currentIdx + 1 > data.length - 1 ? 0 : currentIdx + 1;
-    // side = 0;
   };
 
   const getPrev = () => {
     currentIdx = currentIdx - 1 < 0 ? data.length - 1 : currentIdx - 1;
-    // side = 0;
   };
 </script>
 
@@ -34,9 +43,9 @@
     <button class="content" on:click={content === 'Start' ? getNext : flip}>
       {content}
     </button>
-    <div>
-      <button class="direction" on:click={getPrev}>&lt;-</button>
-      <button class="direction" on:click={getNext}>-&gt;</button>
+    <div class="arrows">
+      <button class="arrow" on:click={getPrev}>&lt;</button>
+      <button class="arrow" on:click={getNext}>&gt;</button>
     </div>
   </div>
 </main>
@@ -51,7 +60,6 @@
 
   .card,
   .card:active {
-    font-size: 5em;
     margin: 0.5rem auto;
     width: calc(100% - 1rem);
     height: calc(100% - 1rem);
@@ -65,12 +73,22 @@
 
   .content,
   .content:active {
-    padding: 2.5em;
+    font-size: 25vw;
+    padding: 2.5rem;
+    margin: 2.5rem;
     background: none;
     border: none;
   }
 
-  .direction {
+  .arrows {
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+  }
+
+  .arrow {
+    font-size: 15vw;
+    padding: 0;
     border: none;
     background: none;
   }
