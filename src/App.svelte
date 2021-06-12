@@ -12,26 +12,28 @@
   let currentIdx = 0;
   let side = 0;
 
+  $: content = data[currentIdx][side];
+
   const flip = () => {
     side = side === 0 ? 1 : 0;
   };
 
   const getNext = () => {
     currentIdx = currentIdx + 1 > data.length - 1 ? 0 : currentIdx + 1;
-    side = 0;
+    // side = 0;
   };
 
   const getPrev = () => {
     currentIdx = currentIdx - 1 < 0 ? data.length - 1 : currentIdx - 1;
-    side = 0;
+    // side = 0;
   };
 </script>
 
 <main>
-  <div class="card" on:click={flip}>
-    <p class="text">
-      {data[currentIdx][side]}
-    </p>
+  <div class="card">
+    <button class="content" on:click={content === 'Start' ? getNext : flip}>
+      {content}
+    </button>
     <div>
       <button class="direction" on:click={getPrev}>&lt;-</button>
       <button class="direction" on:click={getNext}>-&gt;</button>
@@ -61,8 +63,11 @@
     align-items: center;
   }
 
-  .text {
-    margin: 2.5em;
+  .content,
+  .content:active {
+    padding: 2.5em;
+    background: none;
+    border: none;
   }
 
   .direction {
