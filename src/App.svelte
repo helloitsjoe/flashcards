@@ -1,29 +1,13 @@
 <script>
-  const data = [
-    ['Start', 'Start'],
-    ['a', 'あ'],
-    ['e', 'え'],
-    ['i', 'い'],
-    ['o', 'お'],
-    ['u', 'う'],
-    ['ka', 'か'],
-    ['ke', 'け'],
-    ['ki', 'き'],
-    ['ko', 'こ'],
-    ['ku', 'く'],
-    ['ga', 'が'],
-    ['ge', 'げ'],
-    ['gi', 'ぎ'],
-    ['go', 'ご'],
-    ['gu', 'ぐ'],
-    ['n', 'ん'],
-  ];
+  import hiragana from './hiragana';
+
+  let data = [...hiragana];
 
   // let remaining = [...data];
   let currentIdx = 0;
   let side = 0;
 
-  $: content = data[currentIdx][side];
+  $: content = data[currentIdx][side] || 'Start';
 
   const flip = () => {
     side = side === 0 ? 1 : 0;
@@ -36,6 +20,15 @@
   const getPrev = () => {
     currentIdx = currentIdx - 1 < 0 ? data.length - 1 : currentIdx - 1;
   };
+
+  const shuffle = arr => {
+    const temp = [...arr];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [temp[i], temp[j]] = [temp[j], temp[i]];
+    }
+    data = temp.filter(card => card.length);
+  };
 </script>
 
 <main>
@@ -47,6 +40,7 @@
       <button class="arrow" on:click={getPrev}>&lt;</button>
       <button class="arrow" on:click={getNext}>&gt;</button>
     </div>
+    <button on:click={() => shuffle(data)}>Shuffle all</button>
   </div>
 </main>
 
