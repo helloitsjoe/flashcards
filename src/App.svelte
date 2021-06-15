@@ -1,6 +1,19 @@
 <script>
+  import { onMount } from 'svelte';
+  import onSwipe, { Directions } from 'swipey';
   import hiragana from './hiragana';
   import { shuffle } from './utils';
+
+  onMount(() => {
+    const { DOWN } = Directions;
+    const off = onSwipe(DOWN, () => {
+      window.location.reload();
+    });
+
+    return () => {
+      off();
+    };
+  });
 
   let data = { ...hiragana };
 
@@ -45,14 +58,9 @@
 </script>
 
 <main>
+  <!-- TODO: Break this into components -->
   {#if !started}
     <div class="card">
-      <!-- <div class="content"> -->
-      <!-- <select multiple on:mousedown={addGroup}>
-          {#each Object.keys(data) as sound}
-            <option value={sound}>{sound}</option>
-          {/each}
-        </select> -->
       <fieldset class="sounds">
         {#each Object.keys(data) as sound}
           <label>
@@ -66,8 +74,7 @@
           >
         {/each}
       </fieldset>
-      <!-- </div> -->
-      <button on:click={start}>Go</button>
+      <button on:click={start}>Start</button>
     </div>
   {:else}
     <div class="card">
