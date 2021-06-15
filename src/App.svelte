@@ -1,47 +1,86 @@
 <script>
   import hiragana from './hiragana';
+  import { shuffle } from './utils';
 
-  let data = [...hiragana];
+  let data = { ...hiragana };
 
   // let remaining = [...data];
-  let currentIdx = 0;
+  let i = 0;
   let side = 0;
+  let started = false;
 
-  $: content = data[currentIdx][side] || 'Start';
+  let pendingSounds = [];
+  let sounds = [];
 
-  const flip = () => {
-    side = side === 0 ? 1 : 0;
-  };
+  $: content = sounds[i]?.[side] || 'Start';
 
-  const getNext = () => {
-    currentIdx = currentIdx + 1 > data.length - 1 ? 0 : currentIdx + 1;
-  };
+  const flip = () => (side = side === 0 ? 1 : 0);
 
-  const getPrev = () => {
-    currentIdx = currentIdx - 1 < 0 ? data.length - 1 : currentIdx - 1;
-  };
+  const getNext = () => (i = i + 1 > sounds.length - 1 ? 0 : i + 1);
+  const getPrev = () => (i = i - 1 < 0 ? sounds.length - 1 : i - 1);
+  const shuffleCards = () => (sounds = shuffle(sounds));
 
-  const shuffle = arr => {
-    const temp = [...arr];
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [temp[i], temp[j]] = [temp[j], temp[i]];
+  const addGroup = e => {
+    const { value } = e.target;
+
+    if (pendingSounds[value]) {
+      pendingSounds = pendingSounds.filter(g => g !== value);
+    } else {
+      pendingSounds = [...pendingSounds, value];
     }
-    data = temp.filter(card => card.length);
+  };
+
+  $: console.log(pendingSounds);
+  $: console.log(sounds);
+
+  const start = () => {
+    // For now just put all sounds in a single array
+    const temp = [];
+    for (const pending of pendingSounds) {
+      temp.push(data[pending]);
+    }
+    sounds = temp.flat();
+    started = true;
   };
 </script>
 
 <main>
-  <div class="card">
-    <button class="content" on:click={content === 'Start' ? getNext : flip}>
-      {content}
-    </button>
-    <div class="arrows">
-      <button class="arrow" on:click={getPrev}>&lt;</button>
-      <button class="arrow" on:click={getNext}>&gt;</button>
+  {#if !started}
+    <div class="card">
+      <!-- <div class="content"> -->
+      <!-- <select multiple on:mousedown={addGroup}>
+          {#each Object.keys(data) as sound}
+            <option value={sound}>{sound}</option>
+          {/each}
+        </select> -->
+      <fieldset class="sounds">
+        {#each Object.keys(data) as sound}
+          <label>
+            <input
+              type="checkbox"
+              value={sound}
+              checked={sounds.includes(sound)}
+              on:change={addGroup}
+            />
+            {sound.toUpperCase()}</label
+          >
+        {/each}
+      </fieldset>
+      <!-- </div> -->
+      <button on:click={start}>Go</button>
     </div>
-    <button on:click={() => shuffle(data)}>Shuffle all</button>
-  </div>
+  {:else}
+    <div class="card">
+      <button class="content" on:click={content === 'Start' ? getNext : flip}>
+        {content}
+      </button>
+      <div class="arrows">
+        <button class="arrow" on:click={getPrev}>&lt;</button>
+        <button class="arrow" on:click={getNext}>&gt;</button>
+      </div>
+      <button on:click={shuffleCards}>Shuffle all</button>
+    </div>
+  {/if}
 </main>
 
 <style>
@@ -52,11 +91,19 @@
     display: flex;
   }
 
+  .sounds {
+    margin: 1em;
+    font-size: 2em;
+    display: grid;
+    grid-template-columns: repeat(3, 2.5em);
+  }
+
   .card,
   .card:active {
     margin: 0.5rem auto;
     width: calc(100% - 1rem);
     height: calc(100% - 1rem);
+    min-height: -webkit-fill-available;
     background: white;
     border: 1px solid darkgray;
     border-radius: 0.5em;
