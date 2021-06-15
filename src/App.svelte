@@ -6,9 +6,8 @@
   import Sounds from './Sounds.svelte';
 
   onMount(() => {
-    const { DOWN } = Directions;
-    const off = onSwipe(DOWN, () => {
-      window.location.reload();
+    const off = onSwipe(Directions.DOWN, () => window.location.reload(), {
+      fromTop: true,
     });
 
     return () => {

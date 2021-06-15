@@ -1,6 +1,6 @@
 {
-  "short_name": "Svelte",
-  "name": "Svelte App",
+  "short_name": "Flashcards",
+  "name": "Flashcards",
   "icons": [
     {
       "src": "favicon.png",
