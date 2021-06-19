@@ -15,6 +15,14 @@
     }
   };
 
+  const addAllGroups = () => {
+    if (pendingSounds.length === Object.keys(data).length) {
+      pendingSounds = [];
+    } else {
+      pendingSounds = Object.keys(data);
+    }
+  };
+
   const start = () => {
     // For now just put all sounds in a single array
     const temp = [];
@@ -37,6 +45,14 @@
       {sound.toUpperCase()}</label
     >
   {/each}
+  <label>
+    <input
+      type="checkbox"
+      checked={pendingSounds.length === Object.keys(data).length}
+      on:change={addAllGroups}
+    />
+    All</label
+  >
 </fieldset>
 <button on:click={start}>Start</button>
 
