@@ -4,6 +4,7 @@
   import Cards from './Cards.svelte';
   import hiragana from './hiragana';
   import Sounds from './Sounds.svelte';
+  import { shuffle } from './utils';
 
   onMount(() => {
     const off = onSwipe(Directions.DOWN, () => window.location.reload(), {
@@ -25,6 +26,9 @@
     started = true;
   };
 
+  const shuffleCards = () => (groups = shuffle(groups));
+  const removeCard = card => (groups = groups.filter(g => g[0] !== card[0]));
+
   $: console.log(groups);
 </script>
 
@@ -33,7 +37,7 @@
     {#if !started}
       <Sounds {data} {startGame} />
     {:else}
-      <Cards {groups} />
+      <Cards {groups} {shuffleCards} {removeCard} />
     {/if}
   </div>
 </main>

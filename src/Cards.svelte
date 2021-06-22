@@ -1,7 +1,7 @@
 <script>
-  import { shuffle } from './utils';
-
   export let groups;
+  export let shuffleCards;
+  export let removeCard;
 
   // let remaining = [...data];
   let i = 0;
@@ -11,7 +11,6 @@
 
   const getNext = () => (i = i + 1 > groups.length - 1 ? 0 : i + 1);
   const getPrev = () => (i = i - 1 < 0 ? groups.length - 1 : i - 1);
-  const shuffleCards = () => (groups = shuffle(groups));
 
   $: content = groups[i]?.[side] || 'Start';
 </script>
@@ -24,12 +23,17 @@
   <button class="arrow" on:click={getNext}>&gt;</button>
 </div>
 <button on:click={shuffleCards}>Shuffle all</button>
+<button on:click={() => removeCard(groups[i])}>I know this one!</button>
 
 <style>
+  button {
+    padding: 0.4em;
+  }
+
   .content,
   .content:active {
-    font-size: 25vw;
-    padding: 2.5rem;
+    font-size: 35vw;
+    /* padding: 2.5rem; */
     margin: 2.5rem;
     background: none;
     border: none;
