@@ -115,6 +115,8 @@ const data = {
     ['cho', 'ちょ'],
     ['chu', 'ちゅ'],
   ],
+  // images: [['I', 'https://helloitsjoe.github.io/flashcards/example.jpg']],
+
   // Later:
   // ['sha', 'しゃ'],
   // ['sho', 'しょ'],

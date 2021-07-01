@@ -1,20 +1,8 @@
 <script>
-  import { onMount } from 'svelte';
-  import onSwipe, { Directions } from 'swipey';
   import Cards from './Cards.svelte';
   import hiragana from './hiragana';
   import Sounds from './Sounds.svelte';
   import { shuffle } from './utils';
-
-  onMount(() => {
-    const off = onSwipe(Directions.DOWN, () => window.location.reload(), {
-      fromTop: true,
-    });
-
-    return () => {
-      off();
-    };
-  });
 
   let data = { ...hiragana };
 

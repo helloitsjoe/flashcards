@@ -1,4 +1,5 @@
 <script>
+  import Card from './Card.svelte';
   export let groups;
   export let shuffleCards;
   export let removeCard;
@@ -12,12 +13,10 @@
   const getNext = () => (i = i + 1 > groups.length - 1 ? 0 : i + 1);
   const getPrev = () => (i = i - 1 < 0 ? groups.length - 1 : i - 1);
 
-  $: content = groups[i]?.[side] || 'Start';
+  $: content = groups[i]?.[side];
 </script>
 
-<button class="content" on:click={content === 'Start' ? getNext : flip}>
-  {content}
-</button>
+<Card on:click={content ? flip : getNext} {content} />
 <div class="arrows">
   <button class="arrow" on:click={getPrev}>&lt;</button>
   <button class="arrow" on:click={getNext}>&gt;</button>
@@ -28,15 +27,6 @@
 <style>
   button {
     padding: 0.4em;
-  }
-
-  .content,
-  .content:active {
-    font-size: 35vw;
-    /* padding: 2.5rem; */
-    margin: 2.5rem;
-    background: none;
-    border: none;
   }
 
   .arrows {
