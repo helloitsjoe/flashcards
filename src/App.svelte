@@ -1,10 +1,11 @@
 <script>
   import Cards from './Cards.svelte';
   import hiragana from './hiragana';
-  import Sounds from './Sounds.svelte';
+  import katakana from './katakana';
+  import Categories from './Categories.svelte';
   import { shuffle } from './utils';
 
-  let data = { ...hiragana };
+  let categories = { hiragana, katakana };
 
   let groups = [];
   let started = false;
@@ -23,7 +24,7 @@
 <main>
   <div class="card">
     {#if !started}
-      <Sounds {data} {startGame} />
+      <Categories {categories} {startGame} />
     {:else}
       <Cards {groups} {shuffleCards} {removeCard} />
     {/if}
