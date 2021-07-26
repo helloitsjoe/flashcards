@@ -18,9 +18,25 @@
 {/if}
 
 <style>
+  button {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid dodgerblue;
+    color: dodgerblue;
+    border-radius: 0;
+    background: none;
+    margin: 0.5em;
+    height: 3em;
+    text-transform: uppercase;
+    font-size: 80%;
+    font-weight: 700;
+  }
+
   .group {
     display: flex;
-    flex-direction: column;
-    margin: 5em;
+    width: 80%;
+    margin: 2em;
   }
 </style>
