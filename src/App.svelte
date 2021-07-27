@@ -1,11 +1,13 @@
 <script>
   import Cards from './Cards.svelte';
-  import hiragana from './hiragana';
-  import katakana from './katakana';
+  import hiragana from './data/hiragana';
+  import katakana from './data/katakana';
+  import words from './data/words';
+  import phrases from './data/phrases';
   import Categories from './Categories.svelte';
   import { shuffle } from './utils';
 
-  let categories = { hiragana, katakana };
+  let categories = { hiragana, katakana, words, phrases };
 
   let groups = [];
   let started = false;
