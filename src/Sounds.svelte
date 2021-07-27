@@ -1,6 +1,7 @@
 <script>
   export let data;
   export let startGame;
+  export let clearCategory;
 
   let pendingSounds = [];
   $: console.log(pendingSounds);
@@ -54,7 +55,10 @@
     All</label
   >
 </fieldset>
-<button on:click={start}>Start</button>
+<div class="group">
+  <button on:click={clearCategory}>Back</button>
+  <button on:click={start}>Start</button>
+</div>
 
 <style>
   .sounds {
@@ -62,5 +66,9 @@
     font-size: 2em;
     display: grid;
     grid-template-columns: repeat(3, 2.5em);
+  }
+
+  .group {
+    display: flex;
   }
 </style>
