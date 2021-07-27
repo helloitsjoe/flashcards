@@ -2,8 +2,8 @@
   import Cards from './Cards.svelte';
   import hiragana from './data/hiragana';
   import katakana from './data/katakana';
-  import words from './data/words';
   import phrases from './data/phrases';
+  import words from './data/words';
   import Categories from './Categories.svelte';
   import { shuffle } from './utils';
 

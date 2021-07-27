@@ -7,11 +7,13 @@
 
   let category = null;
 
+  let clearCategory = () => (category = null);
+
   let newCategory = 'foo';
 </script>
 
 {#if category}
-  <Sounds data={categories[category]} {startGame} />
+  <Sounds data={categories[category]} {startGame} {clearCategory} />
 {:else}
   <div class="group">
     {#each Object.keys(categories) as cat}

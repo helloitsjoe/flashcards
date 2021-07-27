@@ -63,8 +63,8 @@ const data = {
   w: [
     ['wa', 'ワ'],
     ['wo', 'ヲ'],
+    ['n', 'ン'],
   ],
-  n: [['n', 'ン']],
   // images: [['I', 'https://helloitsjoe.github.io/flashcards/example.jpg']],
 };
 
