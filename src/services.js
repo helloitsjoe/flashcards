@@ -1,5 +1,5 @@
-const DEFAULT_BRANCH = 'main';
-const GIT_URL = 'https://api.github.com/repos/helloitsjoe/flashcards/git/';
+const DEFAULT_BRANCH = 'git-api';
+const GIT_URL = 'https://api.github.com/repos/helloitsjoe/flashcards/git';
 
 const myFetch = (...args) => {
   return fetch(...args)
@@ -20,7 +20,6 @@ const getGit = (endpoint, options) => {
   return myFetch(`${GIT_URL}/${endpoint}`, options);
 };
 
-// TODO: Do this on a branch
 const getMainHead = () => {
   return getGit(`refs/heads/${DEFAULT_BRANCH}`).then(
     branch => branch.object.sha
@@ -33,11 +32,32 @@ const getLastCommit = mainHeadSha => {
   );
 };
 
-const getBlob = lastCommitSha => {
-  return getGit(`blobs/${lastCommitSha}`).then(data => atob(data.content));
+const getTree = treeSha => {
+  return getGit(`trees/${treeSha}`).then(({ tree }) => {
+    const words = tree.find(({ path }) => path === 'test.json');
+    if (words) {
+      return words.sha;
+    }
+
+    const src = tree.find(({ path }) => path === 'src' || path === 'data');
+
+    if (src) {
+      return getTree(src.sha);
+    }
+  });
 };
 
-const createTreeObject = lastTreeSha => {
+const getBlob = fileSha => {
+  return getGit(`blobs/${fileSha}`).then(data => data.content);
+};
+
+const updateFile = blob => {
+  const contents = JSON.parse(atob(blob));
+  contents.added = { foo: 'bar' };
+  return btoa(JSON.stringify(contents));
+};
+
+const createTreeObject = (lastTreeSha, content) => {
   return getGit(`trees/${lastTreeSha}`, {
     method: 'POST',
     headers: {
@@ -52,11 +72,11 @@ const createTreeObject = lastTreeSha => {
           path: '/src/data/test.json',
           // mode: 'add' for a new file
           mode: 'edit',
-          data: 'edited version of file',
+          data: updateFile(content),
         },
       ],
     },
-  }).then(lastCommit => lastCommit.tree.sha);
+  });
 };
 
 const createCommit = () => {};
@@ -67,5 +87,9 @@ const createCommit = () => {};
 // };
 
 export const addCategory = name => {
-  return getLastCommit();
+  return getMainHead()
+    .then(getLastCommit)
+    .then(getTree)
+    .then(getBlob)
+    .then(console.log);
 };
