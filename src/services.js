@@ -1,16 +1,13 @@
-const DEFAULT_BRANCH = 'git-api';
+const DEFAULT_BRANCH = 'new-words';
 const GIT_URL = 'https://api.github.com/repos/helloitsjoe/flashcards';
 
+export const ENABLE_NEW_WORDS = true;
+
+// References
 // https://gist.github.com/harlantwood/2935203
 // https://mdswanson.com/blog/2011/07/23/digging-around-the-github-api-take-2.html
 // https://docs.github.com/en/rest/reference/git#trees
 // https://docs.github.com/en/rest/reference/pulls#create-a-pull-request
-
-const headers = {
-  'content-type': 'application/json',
-  accept: 'application/vnd.github.v3+json',
-  // Authorization: `token ${process.env.TOKEN}`,
-};
 
 const myFetch = (...args) => {
   return fetch(...args)
@@ -25,144 +22,147 @@ const myFetch = (...args) => {
       return res.json();
     })
     .then(res => {
+      console.log(args[0]);
       console.log(res);
       return res;
     });
 };
 
-const getGit = (endpoint, options) => {
-  return myFetch(`${GIT_URL}/git/${endpoint}`, { headers });
-};
+export const addWord = async ({ key, value }, token) => {
+  const headers = {
+    'content-type': 'application/json',
+    accept: 'application/vnd.github.v3+json',
+    Authorization: `token ${token}`,
+  };
 
-// Route is not ideal but 'pulls' is the only endpoint that isn't at /git
-const postGit = (endpoint, options, route = '/git') => {
-  return myFetch(`${GIT_URL}${route}/${endpoint}`, {
-    method: 'POST',
-    body: JSON.stringify(options.body),
-    headers,
-  });
-};
+  const getGit = endpoint => {
+    return myFetch(`${GIT_URL}/git/${endpoint}`, { headers });
+  };
 
-const getMainHead = () => {
-  return getGit(`refs/heads/${DEFAULT_BRANCH}`).then(
-    branch => branch.object.sha
-  );
-};
+  // Route is not ideal but 'pulls' is the only endpoint that isn't at /git
+  const postGit = (endpoint, options, route = '/git') => {
+    return myFetch(`${GIT_URL}${route}/${endpoint}`, {
+      method: 'POST',
+      body: JSON.stringify(options.body),
+      headers,
+    });
+  };
 
-const getLastTreeSha = mainHeadSha => {
-  return getGit(`commits/${mainHeadSha}`).then(
-    lastCommit => lastCommit.tree.sha
-  );
-};
+  const getHead = () => {
+    return getGit(`refs/heads/${DEFAULT_BRANCH}`).then(
+      branch => branch.object.sha
+    );
+  };
 
-const getBlobSha = treeSha => {
-  // TODO: Is there a simpler way to get the file sha?
-  return getGit(`trees/${treeSha}`).then(({ tree }) => {
-    const words = tree.find(({ path }) => path === 'test.json');
-    const src = tree.find(({ path }) => path === 'src' || path === 'data');
+  const getLastTreeSha = mainHeadSha => {
+    return getGit(`commits/${mainHeadSha}`).then(
+      lastCommit => lastCommit.tree.sha
+    );
+  };
 
-    if (words) {
-      return words.sha;
+  const getFileSha = treeSha => {
+    // TODO: Is there a simpler way to get the file sha?
+    return getGit(`trees/${treeSha}`).then(({ tree }) => {
+      const words = tree.find(({ path }) => path === 'words.json');
+      const src = tree.find(({ path }) => path === 'src' || path === 'data');
+
+      if (words) {
+        return words.sha;
+      }
+
+      if (src) {
+        return getFileSha(src.sha);
+      }
+    });
+  };
+
+  const getFileContents = fileSha => {
+    return getGit(`blobs/${fileSha}`).then(data => data.content);
+  };
+
+  const updateFile = (content, { key, value } = {}) => {
+    const json = JSON.parse(content);
+    if (!key || !value || key in json) {
+      // TODO: Do this validation before any fetching
+      throw new Error(`Key ${key} already exists`);
     }
 
-    if (src) {
-      return getBlobSha(src.sha);
-    }
-  });
-};
+    const newJson = { ...json, ...{ key, value } };
 
-const getBlob = fileSha => {
-  return getGit(`blobs/${fileSha}`).then(data => data.content);
-};
+    console.log('New json:', newJson);
 
-const updateFile = blob => {
-  const contents = JSON.parse(atob(blob));
-  contents.added = { foo: 'bar' };
-  return JSON.stringify(contents, null, 2);
-};
+    return JSON.stringify(newJson, null, 2);
+  };
 
-const createTreeObject = (lastTreeSha, content) => {
-  return postGit(`trees`, {
-    body: {
-      base_tree: lastTreeSha,
-      tree: [
-        {
-          path: 'src/data/test.json',
-          mode: '100644',
-          content,
-        },
-      ],
-    },
-  });
-};
-
-const createCommit = (latestCommitSha, newTree) => {
-  return postGit('commits', {
-    body: {
-      message: 'Adding a word',
-      parents: [latestCommitSha],
-      tree: newTree,
-    },
-  });
-};
-
-const createBranch = (sha, branch) => {
-  return postGit('refs', {
-    body: {
-      ref: `refs/heads/${branch}`,
-      sha,
-    },
-  });
-};
-
-const createPullRequest = branch => {
-  return postGit(
-    'pulls',
-    {
+  const createTreeObject = (lastTreeSha, content) => {
+    return postGit(`trees`, {
       body: {
-        title: 'Add a word',
-        head: branch,
-        base: DEFAULT_BRANCH,
-        maintainer_can_modify: true,
+        base_tree: lastTreeSha,
+        tree: [
+          {
+            path: 'src/data/words.json',
+            mode: '100644',
+            content,
+          },
+        ],
       },
-    },
-    ''
-  );
-};
+    });
+  };
 
-export const addCategory = async name => {
-  // let latestTreeSha = '3f4b52745629cb43fe39d76bfe6a7b47348ed8cc';
-  // const blob = 'ewogICJmaXJzdCI6ICJjb250ZW50Igp9Cg==';
+  const createCommit = (latestCommitSha, newTree, newWord) => {
+    return postGit('commits', {
+      body: {
+        message: `Adding new word: ${newWord}`,
+        parents: [latestCommitSha],
+        tree: newTree,
+      },
+    });
+  };
 
-  // const testCommit = '6e01aa00f4053c35fa16ba70485b5a0fc60d98f6';
-
-  const branch = new Date()
-    .toISOString()
-    .slice(0, 16)
-    .replace('T', '_')
-    .replace(':', '-');
-
-  const latestCommitSha = await getMainHead();
-
-  // Might be simpler to have a standing branch that `main` updates from
-  const latestTreeSha = await getLastTreeSha(latestCommitSha);
-  const blobSha = await getBlobSha(latestTreeSha);
-  const blob = await getBlob(blobSha);
-
-  const created = await createTreeObject(latestTreeSha, updateFile(blob));
-  const commit = await createCommit(latestCommitSha, created.sha);
-
-  const ref = await createBranch(commit.sha, branch);
-  const res = await createPullRequest(branch);
-
-  // return getMainHead()
-  //   .then(getLastTreeSha)
-  //   .then(sha => {
-  //     lastestTreeSha = sha;
-  //     return getTree(sha);
-  //   })
-  //   .then(getBlob);
-  //   .then(blob => {
-  //     createTreeObject(lastTreeSha, blob);
+  // const createBranch = (sha, branch) => {
+  //   return postGit('refs', {
+  //     body: {
+  //       ref: `refs/heads/${branch}`,
+  //       sha,
+  //     },
   //   });
+  // };
+
+  // const createPullRequest = branch => {
+  //   return postGit(
+  //     'pulls',
+  //     {
+  //       body: {
+  //         title: 'Add a word',
+  //         head: branch,
+  //         base: DEFAULT_BRANCH,
+  //         maintainer_can_modify: true,
+  //       },
+  //     },
+  //     ''
+  //   );
+  // };
+
+  const latestCommitSha = await getHead();
+
+  // Option 1: long-lived branch that `main` updates from
+  const latestTreeSha = await getLastTreeSha(latestCommitSha);
+  const fileSha = await getFileSha(latestTreeSha);
+  const fileContents = await getFileContents(fileSha);
+
+  const updatedFile = updateFile(atob(fileContents));
+
+  const created = await createTreeObject(latestTreeSha, updatedFile);
+  const commit = await createCommit(latestCommitSha, created.sha, key);
+
+  // Option 2 (includes lines above): short-lived branches that make PRs to main
+
+  // const branch = new Date()
+  //   .toISOString()
+  //   .slice(0, 16)
+  //   .replace('T', '_')
+  //   .replace(':', '-');
+
+  // const ref = await createBranch(commit.sha, branch);
+  // const res = await createPullRequest(branch);
 };

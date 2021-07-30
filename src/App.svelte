@@ -2,12 +2,11 @@
   import Cards from './Cards.svelte';
   import hiragana from './data/hiragana';
   import katakana from './data/katakana';
-  import phrases from './data/phrases';
-  import words from './data/words';
+  import words from './data/words.json';
   import Categories from './Categories.svelte';
   import { shuffle } from './utils';
 
-  let categories = { hiragana, katakana, words, phrases };
+  let categories = { hiragana, katakana, words };
 
   let groups = [];
   let started = false;

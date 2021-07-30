@@ -1,6 +1,6 @@
 <script>
   import Sounds from './Sounds.svelte';
-  import { addCategory } from './services';
+  import { ENABLE_NEW_WORDS, addWord } from './services';
 
   export let categories;
   export let startGame;
@@ -9,21 +9,28 @@
 
   let clearCategory = () => (category = null);
 
-  let newCategory = 'foo';
+  let newWord = '';
+  let newTranslation = '';
 </script>
 
 {#if category}
   <Sounds data={categories[category]} {startGame} {clearCategory} />
+  {#if ENABLE_NEW_WORDS}
+    <form
+      on:submit|preventDefault={() =>
+        addWord({ key: newWord, value: newTranslation }, 'foo')}
+    >
+      <input bind:value={newWord} />
+      <input bind:value={newTranslation} />
+      <button>Submit</button>
+    </form>
+  {/if}
 {:else}
   <div class="group">
     {#each Object.keys(categories) as cat}
       <button on:click={() => (category = cat)}>{cat}</button>
     {/each}
   </div>
-  <form on:submit|preventDefault={addCategory}>
-    <input bind:value={newCategory} />
-    <button>Submit</button>
-  </form>
 {/if}
 
 <style>
