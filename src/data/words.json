@@ -2,5 +2,6 @@
   "word": "translation",
   "key": "foop",
   "value": "barp",
-  "foop": "barp"
+  "foop": "barp",
+  "foo": "barp"
 }
