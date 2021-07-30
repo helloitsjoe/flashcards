@@ -4,8 +4,9 @@
   "value": "barp",
   "foop": "barp",
   "foo": "barp",
-  "test": "ÃÂ¥ÃÂÃÂ",
+  "test": "ÃÂÃÂ¥ÃÂÃÂÃÂÃÂ",
   "another": "test",
-  "beep": "ä»®",
-  "est": "again"
+  "beep": "Ã¤Â»Â®",
+  "est": "again",
+  "eep": "仮"
 }
