@@ -9,8 +9,8 @@ export const ENABLE_NEW_WORDS = true;
 // https://docs.github.com/en/rest/reference/git#trees
 // https://docs.github.com/en/rest/reference/pulls#create-a-pull-request
 
-const myFetch = (...args) => {
-  return fetch(...args)
+const myFetch = (url, options) => {
+  return fetch(url, options)
     .then(res => {
       if (!res.ok) {
         return res.json().then(err => {
@@ -19,24 +19,33 @@ const myFetch = (...args) => {
           );
         });
       }
+      if (options.headers.Accept.includes('v3.raw')) {
+        return res.text();
+      }
       return res.json();
     })
     .then(res => {
-      console.log(args[0]);
+      console.log(url);
       console.log(res);
       return res;
     });
 };
 
 export const addWord = async ({ key, value }, token) => {
+  sessionStorage.setItem('flashcards-token', token);
+
   const headers = {
-    'content-type': 'application/json',
-    accept: 'application/vnd.github.v3+json',
+    'Content-Type': 'text/html',
+    Accept: 'application/vnd.github.v3+json',
     Authorization: `token ${token}`,
   };
 
-  const getGit = endpoint => {
-    return myFetch(`${GIT_URL}/git/${endpoint}`, { headers });
+  // Contents is not at /git
+  const getGit = (endpoint, options = {}, route = '/git') => {
+    console.log(`options.headers:`, options.headers);
+    return myFetch(`${GIT_URL}${route}/${endpoint}`, {
+      headers: { ...headers, ...options.headers },
+    });
   };
 
   // Route is not ideal but 'pulls' is the only endpoint that isn't at /git
@@ -44,7 +53,15 @@ export const addWord = async ({ key, value }, token) => {
     return myFetch(`${GIT_URL}${route}/${endpoint}`, {
       method: 'POST',
       body: JSON.stringify(options.body),
-      headers,
+      headers: { ...headers, ...options.headers },
+    });
+  };
+
+  const patchGit = (endpoint, options, route = '/git') => {
+    return myFetch(`${GIT_URL}${route}/${endpoint}`, {
+      method: 'PATCH',
+      body: JSON.stringify(options.body),
+      headers: { ...headers, ...options.headers },
     });
   };
 
@@ -76,18 +93,33 @@ export const addWord = async ({ key, value }, token) => {
     });
   };
 
-  const getFileContents = fileSha => {
-    return getGit(`blobs/${fileSha}`).then(data => data.content);
+  const getBlob = fileSha => {
+    return getGit(`blobs/${fileSha}`, {
+      headers: { Accept: 'application/vnd.github.v3.raw' },
+    }).then(data => data.content);
+  };
+
+  const getFileContents = () => {
+    // NOTE: raw content header only works on main branch, ?ref=branch only returns json
+    return getGit(
+      `contents/src/data/words.json`,
+      {
+        headers: {
+          Accept: 'application/vnd.github.v3.raw',
+        },
+      },
+      ''
+    );
   };
 
   const updateFile = (content, { key, value } = {}) => {
-    const json = JSON.parse(content);
+    // const json = JSON.parse(content);
     if (!key || !value || key in json) {
       // TODO: Do this validation before any fetching
       throw new Error(`Key ${key} already exists`);
     }
 
-    const newJson = { ...json, ...{ key, value } };
+    const newJson = { ...json, [key]: value };
 
     console.log('New json:', newJson);
 
@@ -109,13 +141,19 @@ export const addWord = async ({ key, value }, token) => {
     });
   };
 
-  const createCommit = (latestCommitSha, newTree, newWord) => {
+  const createCommit = (latestCommitSha, newTree, key) => {
     return postGit('commits', {
       body: {
-        message: `Adding new word: ${newWord}`,
+        message: `Adding new word: ${key}`,
         parents: [latestCommitSha],
         tree: newTree,
       },
+    });
+  };
+
+  const updateBranch = (sha, branch) => {
+    return patchGit(`refs/heads/${branch}`, {
+      body: { sha },
     });
   };
 
@@ -147,13 +185,20 @@ export const addWord = async ({ key, value }, token) => {
 
   // Option 1: long-lived branch that `main` updates from
   const latestTreeSha = await getLastTreeSha(latestCommitSha);
-  const fileSha = await getFileSha(latestTreeSha);
-  const fileContents = await getFileContents(fileSha);
+  // const fileSha = await getFileSha(latestTreeSha);
+  // const fileContents = await getBlob(fileSha);
+  const fileContents = await getFileContents();
 
-  const updatedFile = updateFile(atob(fileContents));
+  const updatedFile = updateFile(fileContents, {
+    key,
+    value,
+  });
 
-  const created = await createTreeObject(latestTreeSha, updatedFile);
-  const commit = await createCommit(latestCommitSha, created.sha, key);
+  // TODO: Can I update file contents using `contents` endpoint as well?
+
+  // const created = await createTreeObject(latestTreeSha, updatedFile);
+  // const commit = await createCommit(latestCommitSha, created.sha, key);
+  // const ref = await updateBranch(commit.sha, DEFAULT_BRANCH);
 
   // Option 2 (includes lines above): short-lived branches that make PRs to main
 
