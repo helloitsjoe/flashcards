@@ -1,14 +1,15 @@
 <script>
   export let content;
+  $: console.log('content', content);
 </script>
 
 <button class="content" on:click>
   {#if !content}
     Start
-  {:else if content.match(/https?/)}
-    <img src={content} width="100%" height="auto" alt="card" />
+    <!-- {:else if content.match(/https?/)}
+    <img src={content} width="100%" height="auto" alt="card" /> -->
   {:else}
-    {content}
+    {@html content}
   {/if}
 </button>
 

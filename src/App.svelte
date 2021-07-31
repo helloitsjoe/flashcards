@@ -12,7 +12,7 @@
   let started = false;
 
   const startGame = temp => {
-    groups = temp.flat();
+    groups = temp;
     started = true;
   };
 

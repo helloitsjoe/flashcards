@@ -7,7 +7,13 @@
 
   let category = null;
 
-  let clearCategory = () => (category = null);
+  const clearCategory = () => (category = null);
+  const setCategory = cat => (category = cat);
+
+  const handleCategoryClick = cat =>
+    cat === 'words'
+      ? startGame(Object.entries(categories[cat]))
+      : setCategory(cat);
 
   let newWord = '';
   let newTranslation = '';
@@ -55,7 +61,7 @@
 {:else}
   <div class="group">
     {#each Object.keys(categories) as cat}
-      <button on:click={() => (category = cat)}>{cat}</button>
+      <button on:click={() => handleCategoryClick(cat)}>{cat}</button>
     {/each}
   </div>
 {/if}
