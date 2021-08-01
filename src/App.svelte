@@ -52,9 +52,9 @@
 
   .card {
     margin: 0.5rem auto;
-    padding-bottom: 3rem;
+    /* padding-bottom: 3rem; */
     width: calc(100% - 1rem);
-    /* height: calc(100% - 1rem); */
+    height: calc(100% - 1rem);
     min-height: -webkit-fill-available;
     background: white;
     border: 1px solid darkgray;
