@@ -1,6 +1,5 @@
 <script>
   import Sounds from './Sounds.svelte';
-  import { ENABLE_NEW_WORDS, addWord } from './services';
 
   export let categories;
   export let startGame;
@@ -14,50 +13,10 @@
     cat === 'words'
       ? startGame(Object.entries(categories[cat]))
       : setCategory(cat);
-
-  let newWord = '';
-  let newTranslation = '';
-  let warning = '';
-
-  let token = sessionStorage.getItem('flashcards-token') || '';
-  let showTokenInput = !token;
 </script>
-
-{#if warning}
-  <h2>{warning}</h2>
-{/if}
 
 {#if category}
   <Sounds data={categories[category]} {startGame} {clearCategory} />
-  {#if ENABLE_NEW_WORDS}
-    <form
-      on:submit|preventDefault={async () => {
-        if (newWord in categories[category]) {
-          warning = `${newWord} already exists in this category!`;
-          return;
-        }
-
-        showTokenInput = !token;
-
-        try {
-          await addWord({ key: newWord, value: newTranslation }, token);
-
-          showTokenInput = false;
-          newWord = '';
-          newTranslation = '';
-        } catch (err) {
-          console.error(err);
-        }
-      }}
-    >
-      <input bind:value={newWord} />
-      <input bind:value={newTranslation} />
-      {#if showTokenInput}
-        <input bind:value={token} />
-      {/if}
-      <button>Submit</button>
-    </form>
-  {/if}
 {:else}
   <div class="group">
     {#each Object.keys(categories) as cat}

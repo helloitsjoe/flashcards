@@ -4,7 +4,12 @@
   import katakana from './data/katakana';
   import words from './data/words.json';
   import Categories from './Categories.svelte';
+  import NewWord from './NewWord.svelte';
   import { shuffle } from './utils';
+  import { onCustomClick } from './dev-bar';
+
+  let showDevBar = false;
+  onCustomClick(() => (showDevBar = !showDevBar));
 
   let categories = { hiragana, katakana, words };
 
@@ -18,6 +23,9 @@
 
   const shuffleCards = () => (groups = shuffle(groups));
   const removeCard = card => (groups = groups.filter(g => g[0] !== card[0]));
+  const handleNewWordAdded = newWords =>
+    // (categories = { ...categories, words: newWords });
+    (groups = Object.entries(newWords));
 </script>
 
 <main>
@@ -26,6 +34,12 @@
       <Categories {categories} {startGame} />
     {:else}
       <Cards {groups} {shuffleCards} {removeCard} />
+    {/if}
+    {#if showDevBar}
+      <NewWord
+        words={Object.fromEntries(groups)}
+        onNewWordAdded={handleNewWordAdded}
+      />
     {/if}
   </div>
 </main>

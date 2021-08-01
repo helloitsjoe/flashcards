@@ -65,6 +65,14 @@ export const addWord = async ({ key, value }, token) => {
     });
   };
 
+  const putGit = (endpoint, options, route = '/git') => {
+    return myFetch(`${GIT_URL}${route}/${endpoint}`, {
+      method: 'PATCH',
+      body: JSON.stringify(options.body),
+      headers: { ...headers, ...options.headers },
+    });
+  };
+
   const getHead = () => {
     return getGit(`refs/heads/${DEFAULT_BRANCH}`).then(
       branch => branch.object.sha
@@ -113,7 +121,7 @@ export const addWord = async ({ key, value }, token) => {
   };
 
   const updateFile = (content, { key, value } = {}) => {
-    // const json = JSON.parse(content);
+    const json = JSON.parse(content);
     if (!key || !value || key in json) {
       // TODO: Do this validation before any fetching
       throw new Error(`Key ${key} already exists`);
@@ -124,6 +132,18 @@ export const addWord = async ({ key, value }, token) => {
     console.log('New json:', newJson);
 
     return JSON.stringify(newJson, null, 2);
+  };
+
+  const putFile = content => {
+    return putGit(
+      'contents/src/data/words.json',
+      {
+        message: 'Testing',
+        body: content,
+        branch: 'new-words',
+      },
+      ''
+    );
   };
 
   const createTreeObject = (lastTreeSha, content) => {
@@ -195,10 +215,13 @@ export const addWord = async ({ key, value }, token) => {
   });
 
   // TODO: Can I update file contents using `contents` endpoint as well?
+  // Answer: yes, but I still need the blob SHA, so doesn't save much.
 
-  // const created = await createTreeObject(latestTreeSha, updatedFile);
-  // const commit = await createCommit(latestCommitSha, created.sha, key);
-  // const ref = await updateBranch(commit.sha, DEFAULT_BRANCH);
+  const created = await createTreeObject(latestTreeSha, updatedFile);
+  const commit = await createCommit(latestCommitSha, created.sha, key);
+  const ref = await updateBranch(commit.sha, DEFAULT_BRANCH);
+
+  return JSON.parse(updatedFile);
 
   // Option 2 (includes lines above): short-lived branches that make PRs to main
 
