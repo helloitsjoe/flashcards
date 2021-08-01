@@ -1,9 +1,9 @@
 <script>
   export let content;
 
+  $: console.log(`content.length:`, content.length);
   // TODO: Hacky. Probably won't work for sentences
-  $: fontSize =
-    content.length === 1 ? '50vw' : `${100 / (content.length * 0.7)}vw`;
+  $: fontSize = content.length === 1 ? '50vw' : `${100 / content.length}vw`;
 </script>
 
 <button style={`font-size: ${fontSize};`} class="content" on:click>
