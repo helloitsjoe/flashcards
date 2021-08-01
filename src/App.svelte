@@ -18,8 +18,6 @@
 
   const shuffleCards = () => (groups = shuffle(groups));
   const removeCard = card => (groups = groups.filter(g => g[0] !== card[0]));
-
-  $: console.log(groups);
 </script>
 
 <main>
@@ -42,8 +40,9 @@
 
   .card {
     margin: 0.5rem auto;
+    padding-bottom: 3rem;
     width: calc(100% - 1rem);
-    height: calc(100% - 1rem);
+    /* height: calc(100% - 1rem); */
     min-height: -webkit-fill-available;
     background: white;
     border: 1px solid darkgray;
@@ -51,5 +50,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-end;
   }
 </style>
