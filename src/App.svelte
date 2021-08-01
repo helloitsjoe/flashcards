@@ -6,7 +6,7 @@
   import Categories from './Categories.svelte';
   import NewWord from './NewWord.svelte';
   import { shuffle } from './utils';
-  import { onCustomClick } from './dev-bar';
+  import { onCustomClick } from './custom-click';
 
   let showDevBar = false;
   onCustomClick(() => (showDevBar = !showDevBar));
@@ -23,9 +23,7 @@
 
   const shuffleCards = () => (groups = shuffle(groups));
   const removeCard = card => (groups = groups.filter(g => g[0] !== card[0]));
-  const handleNewWordAdded = newWords =>
-    // (categories = { ...categories, words: newWords });
-    (groups = Object.entries(newWords));
+  const handleNewWordAdded = newWords => (groups = Object.entries(newWords));
 </script>
 
 <main>

@@ -2,7 +2,6 @@
   import { addWord } from './services';
   export let words;
   export let onNewWordAdded;
-  console.log('words', words);
 
   let newWord = '';
   let newTranslation = '';

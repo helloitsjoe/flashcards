@@ -4,7 +4,6 @@
   export let shuffleCards;
   export let removeCard;
 
-  // let remaining = [...data];
   let i = 0;
   let side = 0;
 

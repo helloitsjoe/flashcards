@@ -6,19 +6,6 @@ const debug = (...args) =>
   /debug/.test(window.location.search) && console.log(...args);
 
 export const onCustomClick = cb => {
-  // let showDevBar = false;
-
-  // const toggleDevBar = () => {
-  // console.log('here');
-  // console.log(`showDevBar:`, showDevBar);
-  // showDevBar = !showDevBar;
-  // cb();
-  // console.log(`showDevBar:`, showDevBar);
-  // };
-
-  // TODO: Make this a store probably
-  // const getShowDevBar = () => showDevBar;
-
   let timer = null;
   let interval = null;
   let firstTap = null;
@@ -82,6 +69,4 @@ export const onCustomClick = cb => {
     document.removeEventListener('mousedown', start);
     document.removeEventListener('mouseup', end);
   };
-
-  // return { getShowDevBar, toggleDevBar };
 };
