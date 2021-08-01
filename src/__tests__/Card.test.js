@@ -13,10 +13,10 @@ describe('Card.svelte', () => {
     expect(screen.queryByText(/start/i)).not.toBeTruthy();
   });
 
-  it('renders image if content includes http', () => {
-    render(Card, { content: 'http://foo.com' });
-    expect(screen.queryByText(/foo/i)).not.toBeTruthy();
-    expect(screen.queryByText(/start/i)).not.toBeTruthy();
-    expect(screen.queryByAltText(/card/i).src).toBe('http://foo.com/');
-  });
+  // it('renders image if content includes http', () => {
+  //   render(Card, { content: 'http://foo.com' });
+  //   expect(screen.queryByText(/foo/i)).not.toBeTruthy();
+  //   expect(screen.queryByText(/start/i)).not.toBeTruthy();
+  //   expect(screen.queryByAltText(/card/i).src).toBe('http://foo.com/');
+  // });
 });

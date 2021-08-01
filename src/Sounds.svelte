@@ -30,7 +30,7 @@
     for (const pending of pendingSounds) {
       temp.push(data[pending]);
     }
-    startGame(temp);
+    startGame(temp.flat());
   };
 </script>
 

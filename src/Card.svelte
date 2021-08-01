@@ -1,12 +1,16 @@
 <script>
   export let content;
+
+  // TODO: Hacky. Probably won't work for sentences
+  $: fontSize =
+    content.length === 1 ? '50vw' : `${100 / (content.length * 0.7)}vw`;
 </script>
 
-<button class="content" on:click>
+<button style={`font-size: ${fontSize};`} class="content" on:click>
   {#if !content}
     Start
-  {:else if content.match(/https?/)}
-    <img src={content} width="100%" height="auto" alt="card" />
+    <!-- {:else if content.match(/https?/)}
+    <img src={content} width="100%" height="auto" alt="card" /> -->
   {:else}
     {content}
   {/if}
@@ -15,9 +19,9 @@
 <style>
   .content,
   .content:active {
-    font-size: 35vw;
+    height: 50vh;
     padding: 0;
-    margin: 2.5rem;
+    margin: 2.5rem 0;
     background: none;
     border: none;
   }
