@@ -50,7 +50,9 @@
   {#if showTokenInput}
     <input bind:value={token} />
   {/if}
-  <button disabled={!(newWord.length && newTranslation) || submitting}
+  <button
+    class="submit"
+    disabled={!(newWord.length && newTranslation) || submitting}
     >{submitting ? 'Submitting...' : 'Submit'}</button
   >
 </form>
@@ -59,5 +61,10 @@
   .new-word-form {
     display: flex;
     flex-direction: column;
+    margin-bottom: 2em;
+  }
+
+  .submit {
+    padding: 0.5em;
   }
 </style>

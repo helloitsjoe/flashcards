@@ -40,9 +40,7 @@ export const addWord = async ({ key, value }, token) => {
     Authorization: `token ${token}`,
   };
 
-  // Contents is not at /git
   const getGit = (endpoint, options = {}, route = '/git') => {
-    console.log(`options.headers:`, options.headers);
     return myFetch(`${GIT_URL}${route}/${endpoint}`, {
       headers: { ...headers, ...options.headers },
     });
@@ -73,77 +71,57 @@ export const addWord = async ({ key, value }, token) => {
     });
   };
 
-  const getHead = () => {
-    return getGit(`refs/heads/${DEFAULT_BRANCH}`).then(
-      branch => branch.object.sha
-    );
-  };
+  const getHead = () =>
+    getGit(`refs/heads/${DEFAULT_BRANCH}`).then(branch => branch.object.sha);
 
-  const getLastTreeSha = mainHeadSha => {
-    return getGit(`commits/${mainHeadSha}`).then(
-      lastCommit => lastCommit.tree.sha
-    );
-  };
+  const getLastTreeSha = mainHeadSha =>
+    getGit(`commits/${mainHeadSha}`).then(lastCommit => lastCommit.tree.sha);
 
-  const getFileSha = treeSha => {
-    // TODO: Is there a simpler way to get the file sha?
-    return getGit(`trees/${treeSha}`).then(({ tree }) => {
-      const words = tree.find(({ path }) => path === 'words.json');
-      const src = tree.find(({ path }) => path === 'src' || path === 'data');
+  // const getFileSha = treeSha => {
+  //   // TODO: Is there a simpler way to get the file sha?
+  //   return getGit(`trees/${treeSha}`).then(({ tree }) => {
+  //     const words = tree.find(({ path }) => path === 'words.json');
+  //     const src = tree.find(({ path }) => path === 'src' || path === 'data');
 
-      if (words) {
-        return words.sha;
-      }
+  //     if (words) {
+  //       return words.sha;
+  //     }
 
-      if (src) {
-        return getFileSha(src.sha);
-      }
-    });
-  };
+  //     if (src) {
+  //       return getFileSha(src.sha);
+  //     }
+  //   });
+  // };
 
-  const getBlob = fileSha => {
-    return getGit(`blobs/${fileSha}`, {
-      headers: { Accept: 'application/vnd.github.v3.raw' },
-    }).then(data => data.content);
-  };
+  // const getBlob = fileSha => {
+  //   return getGit(`blobs/${fileSha}`, {
+  //     headers: { Accept: 'application/vnd.github.v3.raw' },
+  //   }).then(data => data.content);
+  // };
 
-  const getFileContents = () => {
-    // NOTE: raw content header only works on main branch, ?ref=branch only returns json
-    return getGit(
+  const getFileContents = () =>
+    getGit(
       `contents/src/data/words.json`,
       {
         headers: {
+          // NOTE: raw content header only works on main branch, ?ref=branch only returns json
           Accept: 'application/vnd.github.v3.raw',
         },
       },
       ''
     );
-  };
 
   const updateFile = (content, { key, value } = {}) => {
     const json = JSON.parse(content);
     if (!key || !value || key in json) {
-      // TODO: Do this validation before any fetching
       throw new Error(`Key ${key} already exists`);
     }
 
     const newJson = { ...json, [key]: value };
 
-    console.log('New json:', newJson);
+    // console.log('New json:', newJson);
 
     return JSON.stringify(newJson, null, 2);
-  };
-
-  const putFile = content => {
-    return putGit(
-      'contents/src/data/words.json',
-      {
-        message: 'Testing',
-        body: content,
-        branch: 'new-words',
-      },
-      ''
-    );
   };
 
   const createTreeObject = (lastTreeSha, content) => {
@@ -201,9 +179,8 @@ export const addWord = async ({ key, value }, token) => {
   //   );
   // };
 
-  const latestCommitSha = await getHead();
-
   // Option 1: long-lived branch that `main` updates from
+  const latestCommitSha = await getHead();
   const latestTreeSha = await getLastTreeSha(latestCommitSha);
   // const fileSha = await getFileSha(latestTreeSha);
   // const fileContents = await getBlob(fileSha);
@@ -214,7 +191,7 @@ export const addWord = async ({ key, value }, token) => {
     value,
   });
 
-  // TODO: Can I update file contents using `contents` endpoint as well?
+  // Question: Can I update file contents using `contents` endpoint as well?
   // Answer: yes, but I still need the blob SHA, so doesn't save much.
 
   const created = await createTreeObject(latestTreeSha, updatedFile);

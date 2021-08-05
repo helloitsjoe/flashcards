@@ -47,6 +47,7 @@
     background-color: lightgray;
     width: 100vw;
     height: 100vh;
+    min-height: -webkit-fill-available;
     display: flex;
   }
 
@@ -55,7 +56,6 @@
     /* padding-bottom: 3rem; */
     width: calc(100% - 1rem);
     height: calc(100% - 1rem);
-    min-height: -webkit-fill-available;
     background: white;
     border: 1px solid darkgray;
     border-radius: 0.5em;
