@@ -31,7 +31,7 @@ const myFetch = (url, options) => {
     });
 };
 
-export const addWord = async ({ key, value }, token) => {
+export const addWord = async ({ key, value }, words, token) => {
   sessionStorage.setItem('flashcards-token', token);
 
   const headers = {
@@ -77,8 +77,8 @@ export const addWord = async ({ key, value }, token) => {
   const getLastTreeSha = mainHeadSha =>
     getGit(`commits/${mainHeadSha}`).then(lastCommit => lastCommit.tree.sha);
 
+  // // Unused because getFileContents is simpler, but keeping for reference
   // const getFileSha = treeSha => {
-  //   // TODO: Is there a simpler way to get the file sha?
   //   return getGit(`trees/${treeSha}`).then(({ tree }) => {
   //     const words = tree.find(({ path }) => path === 'words.json');
   //     const src = tree.find(({ path }) => path === 'src' || path === 'data');
@@ -99,27 +99,29 @@ export const addWord = async ({ key, value }, token) => {
   //   }).then(data => data.content);
   // };
 
-  const getFileContents = () =>
-    getGit(
-      `contents/src/data/words.json`,
-      {
-        headers: {
-          // NOTE: raw content header only works on main branch, ?ref=branch only returns json
-          Accept: 'application/vnd.github.v3.raw',
-        },
-      },
-      ''
-    );
+  // Unneeded if we pass `words` into `addWord`
+  // const getFileContents = () =>
+  //   getGit(
+  //     `contents/src/data/words.json`,
+  //     {
+  //       headers: {
+  //         // NOTE: raw content header only works on main branch, ?ref=branch only returns json
+  //         Accept: 'application/vnd.github.v3.raw',
+  //       },
+  //     },
+  //     ''
+  //   );
 
-  const updateFile = (content, { key, value } = {}) => {
-    const json = JSON.parse(content);
-    if (!key || !value || key in json) {
+  const updateContent = (content, { key, value } = {}) => {
+    // const json = JSON.parse(content);
+    console.log('content', content);
+    if (!key || !value || key in content) {
       throw new Error(`Key ${key} already exists`);
     }
 
-    const newJson = { ...json, [key]: value };
+    const newJson = { ...content, [key]: value };
 
-    // console.log('New json:', newJson);
+    console.log('New json:', newJson);
 
     return JSON.stringify(newJson, null, 2);
   };
@@ -184,21 +186,18 @@ export const addWord = async ({ key, value }, token) => {
   const latestTreeSha = await getLastTreeSha(latestCommitSha);
   // const fileSha = await getFileSha(latestTreeSha);
   // const fileContents = await getBlob(fileSha);
-  const fileContents = await getFileContents();
+  // const fileContents = await getFileContents();
 
-  const updatedFile = updateFile(fileContents, {
+  const updatedContent = updateContent(words, {
     key,
     value,
   });
 
-  // Question: Can I update file contents using `contents` endpoint as well?
-  // Answer: yes, but I still need the blob SHA, so doesn't save much.
-
-  const created = await createTreeObject(latestTreeSha, updatedFile);
+  const created = await createTreeObject(latestTreeSha, updatedContent);
   const commit = await createCommit(latestCommitSha, created.sha, key);
   const ref = await updateBranch(commit.sha, DEFAULT_BRANCH);
 
-  return JSON.parse(updatedFile);
+  return JSON.parse(updatedContent);
 
   // Option 2 (includes lines above): short-lived branches that make PRs to main
 

@@ -56,6 +56,7 @@
     /* padding-bottom: 3rem; */
     width: calc(100% - 1rem);
     height: calc(100% - 1rem);
+    max-width: 440px;
     background: white;
     border: 1px solid darkgray;
     border-radius: 0.5em;

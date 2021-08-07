@@ -1,16 +1,13 @@
 <script>
   export let content;
 
-  $: console.log(`content.length:`, content.length);
-  // TODO: Hacky. Probably won't work for sentences
-  $: fontSize = content.length === 1 ? '50vw' : `${100 / content.length}vw`;
+  // TODO: Make this less hacky
+  $: fontSize = content.length === 1 ? '50vw' : `${70 / content.length}vw`;
 </script>
 
 <button style={`font-size: ${fontSize};`} class="content" on:click>
   {#if !content}
     Start
-    <!-- {:else if content.match(/https?/)}
-    <img src={content} width="100%" height="auto" alt="card" /> -->
   {:else}
     {content}
   {/if}

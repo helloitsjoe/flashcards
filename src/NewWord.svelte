@@ -30,6 +30,7 @@
       submitting = true;
       const newWords = await addWord(
         { key: newWord, value: newTranslation },
+        words,
         token
       );
       onNewWordAdded(newWords);
