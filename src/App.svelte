@@ -7,11 +7,16 @@
   import NewWord from './NewWord.svelte';
   import { shuffle } from './utils';
   import { onCustomClick } from './custom-click';
+  import { getWordsLocal } from './services';
 
   let showDevBar = false;
   onCustomClick(() => (showDevBar = !showDevBar));
 
-  let categories = { hiragana, katakana, words };
+  let categories = {
+    hiragana,
+    katakana,
+    words: { ...words, ...getWordsLocal() },
+  };
 
   let groups = [];
   let started = false;
@@ -33,12 +38,12 @@
     {:else}
       <Cards {groups} {shuffleCards} {removeCard} />
     {/if}
-    {#if showDevBar}
-      <NewWord
-        words={Object.fromEntries(groups)}
-        onNewWordAdded={handleNewWordAdded}
-      />
-    {/if}
+    <!-- {#if showDevBar} -->
+    <NewWord
+      words={Object.fromEntries(groups)}
+      onNewWordAdded={handleNewWordAdded}
+    />
+    <!-- {/if} -->
   </div>
 </main>
 

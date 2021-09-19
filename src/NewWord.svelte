@@ -1,5 +1,5 @@
 <script>
-  import { addWord } from './services';
+  import { addWordLocal } from './services';
   export let words;
   export let onNewWordAdded;
 
@@ -8,49 +8,40 @@
   let warning = '';
   let submitting = false;
 
-  let token = sessionStorage.getItem('flashcards-token') || '';
-  let showTokenInput = !token;
-</script>
+  // let token = sessionStorage.getItem('flashcards-token') || '';
+  // let showTokenInput = !token;
 
-{#if warning}
-  <h2>{warning}</h2>
-{/if}
-
-<form
-  on:submit|preventDefault={async () => {
+  let handleFormSubmit = async () => {
     if (newWord in words) {
       warning = `${newWord} already exists!`;
       return;
     }
 
     warning = '';
-    showTokenInput = !token;
+    // showTokenInput = !token;
 
-    try {
-      submitting = true;
-      const newWords = await addWord(
-        { key: newWord, value: newTranslation },
-        words,
-        token
-      );
-      onNewWordAdded(newWords);
+    submitting = true;
+    const newWords = { ...words, [newWord]: newTranslation };
+    addWordLocal(newWords);
+    onNewWordAdded(newWords);
 
-      showTokenInput = false;
-      newWord = '';
-      newTranslation = '';
-    } catch (err) {
-      console.error(err);
-    }
-
+    // showTokenInput = false;
+    newWord = '';
+    newTranslation = '';
     submitting = false;
-  }}
-  class="new-word-form"
->
+  };
+</script>
+
+{#if warning}
+  <h2>{warning}</h2>
+{/if}
+
+<form on:submit|preventDefault={handleFormSubmit} class="new-word-form">
   <input placeholder="English word" bind:value={newWord} />
   <input placeholder="Translation" bind:value={newTranslation} />
-  {#if showTokenInput}
+  <!-- {#if showTokenInput}
     <input bind:value={token} />
-  {/if}
+  {/if} -->
   <button
     class="submit"
     disabled={!(newWord.length && newTranslation) || submitting}

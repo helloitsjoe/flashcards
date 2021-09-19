@@ -210,3 +210,13 @@ export const addWord = async ({ key, value }, words, token) => {
   // const ref = await createBranch(commit.sha, branch);
   // const res = await createPullRequest(branch);
 };
+
+export const addWordLocal = words => {
+  localStorage.setItem('flashcards-words', JSON.stringify(words));
+  return words;
+};
+
+export const getWordsLocal = () => {
+  const words = localStorage.getItem('flashcards-words') || '{}';
+  return JSON.parse(words);
+};
