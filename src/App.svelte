@@ -10,7 +10,8 @@
   import { getWordsLocal } from './services';
 
   let showDevBar = false;
-  onCustomClick(() => (showDevBar = !showDevBar));
+  let toggleAddWord = () => (showDevBar = !showDevBar);
+  // onCustomClick(() => (showDevBar = !showDevBar));
 
   let categories = {
     hiragana,
@@ -29,6 +30,7 @@
   const shuffleCards = () => (groups = shuffle(groups));
   const removeCard = card => (groups = groups.filter(g => g[0] !== card[0]));
   const handleNewWordAdded = newWords => (groups = Object.entries(newWords));
+  // TODO: Sync words
 </script>
 
 <main>
@@ -38,12 +40,15 @@
     {:else}
       <Cards {groups} {shuffleCards} {removeCard} />
     {/if}
-    <!-- {#if showDevBar} -->
-    <NewWord
-      words={Object.fromEntries(groups)}
-      onNewWordAdded={handleNewWordAdded}
-    />
-    <!-- {/if} -->
+    {#if showDevBar}
+      <NewWord
+        words={Object.fromEntries(groups)}
+        onNewWordAdded={handleNewWordAdded}
+      />
+      <div class="addWord" on:click={toggleAddWord}>-</div>
+    {:else}
+      <div class="addWord" on:click={toggleAddWord}>+</div>
+    {/if}
   </div>
 </main>
 
@@ -69,5 +74,12 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
+  }
+
+  .addWord {
+    font-size: 3rem;
+    align-self: end;
+    margin-right: 0.5em;
+    margin-bottom: 0.5em;
   }
 </style>
