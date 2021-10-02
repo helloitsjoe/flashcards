@@ -1,0 +1,15 @@
+{
+  "short_name": "Flashcards",
+  "name": "Flashcards",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "114x114",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#00ff0c",
+  "background_color": "#ffffff"
+}
