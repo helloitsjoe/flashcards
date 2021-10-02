@@ -45,9 +45,13 @@
         words={Object.fromEntries(groups)}
         onNewWordAdded={handleNewWordAdded}
       />
-      <div class="addWord" on:click={toggleAddWord}>-</div>
+      <div class="addWord-container">
+        <div class="addWord" on:click={toggleAddWord}>-</div>
+      </div>
     {:else}
-      <div class="addWord" on:click={toggleAddWord}>+</div>
+      <div class="addWord-container">
+        <div class="addWord" on:click={toggleAddWord}>+</div>
+      </div>
     {/if}
   </div>
 </main>
@@ -76,9 +80,14 @@
     justify-content: flex-end;
   }
 
+  .addWord-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
   .addWord {
     font-size: 3rem;
-    align-self: end;
     margin-right: 0.5em;
     margin-bottom: 0.5em;
   }
