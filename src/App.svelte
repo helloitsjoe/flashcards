@@ -2,12 +2,12 @@
   import Cards from './Cards.svelte';
   import hiragana from './data/hiragana';
   import katakana from './data/katakana';
-  import words from './data/words.json';
   import Categories from './Categories.svelte';
   import NewWord from './NewWord.svelte';
   import { shuffle, convertWords } from './utils';
   import { onCustomClick } from './custom-click';
   import { getWordsLocal } from './services';
+  export let words = {};
 
   let showDevBar = false;
   let toggleAddWord = () => (showDevBar = !showDevBar);
@@ -25,6 +25,7 @@
   
   let groups = convertWords(categories.words);
   let started = true;
+  let currentCardIdx = 0;
 
   /* const startGame = temp => { */
   /*   groups = temp; */
@@ -33,16 +34,19 @@
 
   const shuffleCards = () => (groups = shuffle(groups));
   const removeCard = card => (groups = groups.filter(g => g[0] !== card[0]));
-  const handleNewWordAdded = newWords => (groups = convertWords(newWords));
+  const handleNewWordAdded = newWords => {
+    groups = newWords
+    currentCardIdx = groups.length - 1;
+  };
   // TODO: Sync words
 </script>
 
 <main>
   <div class="card">
-    <Cards {groups} {shuffleCards} {removeCard} />
+    <Cards {groups} {shuffleCards} {removeCard} {currentCardIdx} />
     {#if showDevBar}
       <NewWord
-        words={Object.fromEntries(groups)}
+        words={groups}
         onNewWordAdded={handleNewWordAdded}
       />
       <div class="addWord-container">

@@ -3,12 +3,12 @@
   export let groups;
   export let shuffleCards;
   export let removeCard;
-
-  let i = 0;
+  export let currentCardIdx;
 
   const getNext = () => (i = i + 1 > groups.length - 1 ? 0 : i + 1);
   const getPrev = () => (i = i - 1 < 0 ? groups.length - 1 : i - 1);
 
+  $: i = currentCardIdx;
   $: content = groups[i];
 </script>
 

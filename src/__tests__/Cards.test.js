@@ -8,6 +8,7 @@ describe('Cards.svelte', () => {
         { english: 'Foo', japanese: '車' },
         { english: 'Bar', japanese: '車車' },
       ],
+      currentCardIdx: 0,
       shuffleCards() {},
       removeCard() {},
     });
