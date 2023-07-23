@@ -5,17 +5,14 @@
   export let removeCard;
 
   let i = 0;
-  let side = 0;
-
-  const flip = () => (side = side === 0 ? 1 : 0);
 
   const getNext = () => (i = i + 1 > groups.length - 1 ? 0 : i + 1);
   const getPrev = () => (i = i - 1 < 0 ? groups.length - 1 : i - 1);
 
-  $: content = groups[i]?.[side];
+  $: content = groups[i];
 </script>
 
-<Card on:click={content ? flip : getNext} {content} />
+<Card {content} />
 <div class="arrows">
   <button class="arrow" on:click={getPrev}>&lt;</button>
   <button class="arrow" on:click={getNext}>&gt;</button>

@@ -21,7 +21,7 @@
     // showTokenInput = !token;
 
     submitting = true;
-    const newWords = { ...words, [newWord]: newTranslation };
+    const newWords = [ ...words, {english: newWord, japanese: newTranslation }];
     addWordLocal(newWords);
     onNewWordAdded(newWords);
 
@@ -37,8 +37,8 @@
 {/if}
 
 <form on:submit|preventDefault={handleFormSubmit} class="new-word-form">
-  <input placeholder="English word" bind:value={newWord} />
-  <input placeholder="Translation" bind:value={newTranslation} />
+  <input placeholder="English" bind:value={newWord} />
+  <input placeholder="Japanese" lang="ja" bind:value={newTranslation} />
   <!-- {#if showTokenInput}
     <input bind:value={token} />
   {/if} -->
